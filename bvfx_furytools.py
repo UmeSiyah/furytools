@@ -11,8 +11,7 @@ __creation__ = "Sep 13 2023"
 __date__ = "Oct 14 2023"
 __web__ = "www.boundaryvfx.com"
 
-log = logging.getLogger(__name__)
-log.info("Loading %s " % os.path.abspath(__file__))
+LOGGER = logging.getLogger(__name__)
 
 
 def signature(thenode):
