@@ -22,12 +22,18 @@ def signature(thenode):
     """
     name = "RotoFury" if "RotoFury" in thenode.name() else "TrackerFury"
     name += " - Revenge of the Motion Vectors"
-    header = '''<span style="color:#aaa;font-family:sans-serif;font-size:8pt">'''
-    extratext = '''<br>by <a href="https://github.com/magnoborgo/" style="color:#aaa">Magno Borgo</a>\nBoundary Visual Effects</span>'''
-    version = "<br>v " + str(__version__) + " created " + \
-        __creation__ + ", updated " + __date__
+    header = """<span style="color:#aaa;font-family:sans-serif;font-size:8pt">"""
+    extratext = """<br>by <a href="https://github.com/magnoborgo/" style="color:#aaa">Magno Borgo</a>\nBoundary Visual Effects</span>"""
+    version = (
+        "<br>v "
+        + str(__version__)
+        + " created "
+        + __creation__
+        + ", updated "
+        + __date__
+    )
     try:
-        thenode["bvfxsignature"].setValue(name+header+version + extratext)
+        thenode["bvfxsignature"].setValue(name + header + version + extratext)
         thenode["fRangeS"].setValue(nuke.Root()["first_frame"].getValue())
         thenode["fRangeE"].setValue(nuke.Root()["last_frame"].getValue())
     except Exception:
@@ -47,15 +53,35 @@ def trackerGrid(thenode):
 
     nodeWidth = thenode.width()
     nodeHeight = thenode.height()
-    columns = int(thenode['trkgridX'].getValue()+1)
-    rows = int(thenode['trkgridY'].getValue()+1)
+    columns = int(thenode["trkgridX"].getValue() + 1)
+    rows = int(thenode["trkgridY"].getValue() + 1)
 
     if inputNode.Class() != "Tracker4":
         raise Exception("Please attach a Tracker4 to TrackerNode input")
 
     numColumns = 31
-    Trk4_parameters = ["enable", "name", "track_x", "track_y", "offset_x", "offset_y", "T", "R", "S", "error", "error_min",
-                       "error_max", "pattern_x", "pattern_y", "pattern_r", "pattern_t",  "search_x", "search_y", "search_r", "search_t"]
+    Trk4_parameters = [
+        "enable",
+        "name",
+        "track_x",
+        "track_y",
+        "offset_x",
+        "offset_y",
+        "T",
+        "R",
+        "S",
+        "error",
+        "error_min",
+        "error_max",
+        "pattern_x",
+        "pattern_y",
+        "pattern_r",
+        "pattern_t",
+        "search_x",
+        "search_y",
+        "search_r",
+        "search_t",
+    ]
 
     trackerNode = inputNode
     numTracks = 0
@@ -63,21 +89,26 @@ def trackerGrid(thenode):
     inputNode.showControlPanel()
 
     for _ in range(1, 1000):
-        check = nuke.tcl(
-            "value {0}.tracks.{1}.track_x".format(trackerNode.name(), _))
-        if check == '1':
+        check = nuke.tcl("value {0}.tracks.{1}.track_x".format(trackerNode.name(), _))
+        if check == "1":
             numTracks = _ - 1
             break
     trker = 0
     for c in range(1, columns):
-        x = (nodeWidth/columns)*c
+        x = (nodeWidth / columns) * c
         for r in range(1, rows):
             trackerNode["add_track"].execute()
-            y = (nodeHeight/rows)*r
-            trackerNode['tracks'].setValueAt(
-                x, nuke.frame(), numColumns*(trker+numTracks) + Trk4_parameters.index("track_x"))
-            trackerNode['tracks'].setValueAt(
-                y, nuke.frame(), numColumns*(trker+numTracks) + Trk4_parameters.index("track_y"))
+            y = (nodeHeight / rows) * r
+            trackerNode["tracks"].setValueAt(
+                x,
+                nuke.frame(),
+                numColumns * (trker + numTracks) + Trk4_parameters.index("track_x"),
+            )
+            trackerNode["tracks"].setValueAt(
+                y,
+                nuke.frame(),
+                numColumns * (trker + numTracks) + Trk4_parameters.index("track_y"),
+            )
             trker += 1
 
 
@@ -101,7 +132,7 @@ def roto_walker(nodeRoot, shapelist=[]):
 
 
 def sampleInRangecv(node, x, y, f):
-    """ samples the image with a curve tool
+    """samples the image with a curve tool
 
     Args:
         node (Node): a curvetool node
@@ -112,12 +143,12 @@ def sampleInRangecv(node, x, y, f):
     Returns:
         float: u,v values
     """
-    r = x+1
-    t = y+1
+    r = x + 1
+    t = y + 1
 
-    node["ROI"].fromDict({'y': y, 'x': x, 'r': r, 't': t})
+    node["ROI"].fromDict({"y": y, "x": x, "r": r, "t": t})
     nuke.execute(node, f, f)
-    uv = node['intensitydata'].getValueAt(f)
+    uv = node["intensitydata"].getValueAt(f)
 
     return uv[0], uv[1]
 
@@ -140,9 +171,8 @@ def main(thenode, furytool, mode="default"):
 
     if furytool == "roto":
         if inputNode.Class() not in ("Roto", "RotoPaint"):
-            raise Exception(
-                "Please attach a Roto or Rotopaint node to RotoNode input")
-        rotoCurves = inputNode['curves']
+            raise Exception("Please attach a Roto or Rotopaint node to RotoNode input")
+        rotoCurves = inputNode["curves"]
         rotoRoot = rotoCurves.rootLayer
         if len(rotoRoot) == 0:
             raise Exception("Roto node empty, create a shape")
@@ -150,13 +180,32 @@ def main(thenode, furytool, mode="default"):
         if inputNode.Class() != "Tracker4":
             raise Exception("Please attach a Tracker4 to TrackerNode input")
         numColumns = 31
-        Trk4_parameters = ["enable", "name", "track_x", "track_y", "offset_x", "offset_y", "T", "R", "S", "error", "error_min",
-                           "error_max", "pattern_x", "pattern_y", "pattern_r", "pattern_t",  "search_x", "search_y", "search_r", "search_t"]
+        Trk4_parameters = [
+            "enable",
+            "name",
+            "track_x",
+            "track_y",
+            "offset_x",
+            "offset_y",
+            "T",
+            "R",
+            "S",
+            "error",
+            "error_min",
+            "error_max",
+            "pattern_x",
+            "pattern_y",
+            "pattern_r",
+            "pattern_t",
+            "search_x",
+            "search_y",
+            "search_r",
+            "search_t",
+        ]
         trackerNode = inputNode  # nuke.toNode("TrackerFury")
-        nodeTracks = trackerNode['tracks']
-        if trackerNode['selected_tracks'].value() == "" and execution_type == 0.0:
-            raise Exception(
-                "Please select some trackers on " + inputNode.name())
+        nodeTracks = trackerNode["tracks"]
+        if trackerNode["selected_tracks"].value() == "" and execution_type == 0.0:
+            raise Exception("Please select some trackers on " + inputNode.name())
 
     else:
         raise Exception("Wrong furytool setting")
@@ -176,29 +225,37 @@ def main(thenode, furytool, mode="default"):
 
     key_only = int(thenode["keyframe"].getValue())
     # access node inside group
-    target = nuke.toNode(thenode.name()+".Shuffle_mv")
-    curve_tool = nuke.toNode(thenode.name()+'.ct')
+    target = nuke.toNode(thenode.name() + ".Shuffle_mv")
+    curve_tool = nuke.toNode(thenode.name() + ".ct")
     if furytool == "roto":
         if execution_type == 0.0:  # selected
-            idxs = [point.center for shape in rotoCurves.getSelected()
-                    for point in shape if isinstance(shape, rp.Shape)]
+            idxs = [
+                point.center
+                for shape in rotoCurves.getSelected()
+                for point in shape
+                if isinstance(shape, rp.Shape)
+            ]
         elif execution_type == 1.0:  # all
             shapes = roto_walker(rotoRoot)
-            idxs = [point.center for shape in shapes for point in shape if isinstance(
-                shape, rp.Shape)]
+            idxs = [
+                point.center
+                for shape in shapes
+                for point in shape
+                if isinstance(shape, rp.Shape)
+            ]
             # print(idxs)
     elif furytool == "tracker":
         if execution_type == 0.0:  # selected
-            idxs = [int(x)
-                    for x in trackerNode['selected_tracks'].value().split(",")]
+            idxs = [int(x) for x in trackerNode["selected_tracks"].value().split(",")]
         elif execution_type == 1.0:  # all
             # ===============================================================
             # find the amount of trackers inside this Tracker4 mess
             numTracks = 0
             for _ in range(1, 1000):
                 check = nuke.tcl(
-                    "value {0}.tracks.{1}.track_x".format(trackerNode.name(), _))
-                if check == '1':
+                    "value {0}.tracks.{1}.track_x".format(trackerNode.name(), _)
+                )
+                if check == "1":
                     numTracks = _ - 1
                     break
             idxs = range(numTracks)
@@ -208,12 +265,15 @@ def main(thenode, furytool, mode="default"):
     elif len(idxs) == 0 and furytool == "tracker":
         raise Exception("Please select trackers on %s" + inputNode.name())
     else:
-        intensity_knob = curve_tool['intensitydata']
+        intensity_knob = curve_tool["intensitydata"]
         intensity_knob.clearAnimated()
         intensity_knob.setAnimated()
 
-        progressframes = (end_frame-start_frame)+1 if (end_frame >=
-                                                       start_frame) else (start_frame-end_frame)+1
+        progressframes = (
+            (end_frame - start_frame) + 1
+            if (end_frame >= start_frame)
+            else (start_frame - end_frame) + 1
+        )
         count = 1
         trackParams = {}
         if furytool == "roto":
@@ -224,22 +284,27 @@ def main(thenode, furytool, mode="default"):
         elif furytool == "tracker":
             for trackIdx in idxs:
                 x = nodeTracks.getValue(
-                    numColumns*trackIdx + Trk4_parameters.index("track_x"))
+                    numColumns * trackIdx + Trk4_parameters.index("track_x")
+                )
                 y = nodeTracks.getValue(
-                    numColumns*trackIdx + Trk4_parameters.index("track_y"))
-                trackParams[trackIdx] = {
-                    "x_pos": x, "y_pos": y, "x": x, "y": y}
+                    numColumns * trackIdx + Trk4_parameters.index("track_y")
+                )
+                trackParams[trackIdx] = {"x_pos": x, "y_pos": y, "x": x, "y": y}
 
-        frange = range(start_frame, end_frame+1) if (end_frame >=
-                                                     start_frame) else range(start_frame, end_frame-1, -1)
+        frange = (
+            range(start_frame, end_frame + 1)
+            if (end_frame >= start_frame)
+            else range(start_frame, end_frame - 1, -1)
+        )
         taskname = "RotoFury" if "RotoFury" in thenode.name() else "TrackerFury"
         task = nuke.ProgressTask(taskname)
 
         for frame in frange:
-
             # task progress stuff
-            tprogress = int(count*100/progressframes)
-            if tprogress % 1 == 0:  # update every x% otherwise progress task slows down processing
+            tprogress = int(count * 100 / progressframes)
+            if (
+                tprogress % 1 == 0
+            ):  # update every x% otherwise progress task slows down processing
                 task.setProgress(tprogress)
             if task.isCancelled():
                 break
@@ -252,39 +317,53 @@ def main(thenode, furytool, mode="default"):
                     break
                 # print(frame,trackParams[trackIdx])
                 u, v = sampleInRangecv(
-                    curve_tool, trackParams[trackIdx]["x"], trackParams[trackIdx]["y"], frame)
+                    curve_tool,
+                    trackParams[trackIdx]["x"],
+                    trackParams[trackIdx]["y"],
+                    frame,
+                )
                 if frame == start_frame:
                     updatex = trackParams[trackIdx]["x_pos"]
                     updatey = trackParams[trackIdx]["y_pos"]
                 else:
-                    if (end_frame >= start_frame):
-                        updatex = trackParams[trackIdx]["x_pos"]+(u)
-                        updatey = trackParams[trackIdx]["y_pos"]+(v)
+                    if end_frame >= start_frame:
+                        updatex = trackParams[trackIdx]["x_pos"] + (u)
+                        updatey = trackParams[trackIdx]["y_pos"] + (v)
                     else:  # going backwards
-                        updatex = trackParams[trackIdx]["x_pos"]-(u)
-                        updatey = trackParams[trackIdx]["y_pos"]-(v)
+                        updatex = trackParams[trackIdx]["x_pos"] - (u)
+                        updatey = trackParams[trackIdx]["y_pos"] - (v)
 
                 if (frame - start_frame) % nstep == 0 or frame == end_frame:
                     if furytool == "roto":
                         trackIdx.addPositionKey(frame, (updatex, updatey))
                     elif furytool == "tracker":
                         nodeTracks.setValueAt(
-                            updatex, frame, numColumns*trackIdx + Trk4_parameters.index("track_x"))
+                            updatex,
+                            frame,
+                            numColumns * trackIdx + Trk4_parameters.index("track_x"),
+                        )
                         nodeTracks.setValueAt(
-                            updatey, frame, numColumns*trackIdx + Trk4_parameters.index("track_y"))
+                            updatey,
+                            frame,
+                            numColumns * trackIdx + Trk4_parameters.index("track_y"),
+                        )
 
                 else:  # remove previous keys
                     if furytool == "roto":
                         trackIdx.removePositionKey(frame)
                     elif furytool == "tracker":
                         nodeTracks.removeKeyAt(
-                            frame, numColumns*trackIdx + Trk4_parameters.index("track_x"))
+                            frame,
+                            numColumns * trackIdx + Trk4_parameters.index("track_x"),
+                        )
                         nodeTracks.removeKeyAt(
-                            frame, numColumns*trackIdx + Trk4_parameters.index("track_y"))
+                            frame,
+                            numColumns * trackIdx + Trk4_parameters.index("track_y"),
+                        )
                 trackParams[trackIdx]["x_pos"] = updatex
                 trackParams[trackIdx]["y_pos"] = updatey
                 if frame % update_sampling == 0:
-                    #print("updating ref frame", frame )
+                    # print("updating ref frame", frame )
                     # nuke.frame(frame)
                     # trackerNode["set_key_frame"].execute()
                     trackParams[trackIdx]["x"] = updatex
@@ -294,12 +373,12 @@ def main(thenode, furytool, mode="default"):
         if furytool == "roto":
             rotoCurves.changed()
 
-        del(task)
+        del task
         if mode in ("nextnframes", "previousnframes"):
             nuke.frame(end_frame)
         if furytool == "tracker":
             nuke.frame(end_frame)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
